@@ -1,4 +1,4 @@
-setwd("F:/Bitcoin")
+setwd("F:/Bitcoin-Quantitative-Analysis-BQA-")
 
 # load relevant libraries
 library(ggplot2); library(gridExtra)
@@ -140,16 +140,12 @@ acf(ht) # cuts off at lag 1
 pacf(ht) # cuts off at lag 2
 par(mfrow = c(1,1))
 
-garch11 <- ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1)), 
-                      mean.model = list(armaOrder = c(0, 0)))
+# GARCH(1,1) Model using the library rugarch
+garch11 <- ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1)), mean.model = list(armaOrder = c(0, 0)))
 garch11fit <- ugarchfit(spec = garch11, data = rt, solver = "hybrid")
 garch11fit
 
 
-plot(rt)
-plot(et2)
-auto.arima(et2)
-merge(et2, lag(et2, -1), lag(et2, -2), lag(et2,-3), lag(et2))
 
 
 
