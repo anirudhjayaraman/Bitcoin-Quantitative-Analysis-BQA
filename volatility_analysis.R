@@ -141,9 +141,50 @@ pacf(ht) # cuts off at lag 2
 par(mfrow = c(1,1))
 
 # GARCH(1,1) Model using the library rugarch
-garch11 <- ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1)), mean.model = list(armaOrder = c(0, 0)))
-garch11fit <- ugarchfit(spec = garch11, data = rt, solver = "hybrid")
-garch11fit
+garch11bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(1, 1)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch11bitfit <- ugarchfit(spec = garch11bit, data = rt, solver = "hybrid")
+garch11bitfit
+names(garch11bitfit@fit)
+names(garch11bitfit@model)
+
+garch11bitfit@fit$condH # [1] 6.961193
+
+# Estimated conditional variances
+cond_var <- zoo(x = garch11bitfit@fit$var, order.by = prices$Date)
+
+p10 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue') +
+  xlab('Date') + 
+  ylab('Squared Returns') +
+  ggtitle('Squared Return Series')
+p11 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = cond_var), col = 'red') +
+  xlab('Date') + 
+  ylab('Conditional Variances') +
+  ggtitle('Modeled Variance')
+grid.arrange(p10, p11, nrow = 2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
