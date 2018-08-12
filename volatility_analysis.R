@@ -204,6 +204,7 @@ p10 <- ggplot() +
   ggtitle('Squared Return Series vs iGARCH modeled variance')
 grid.arrange(p10, nrow = 1)
 
+#
 
 
 
@@ -215,3 +216,123 @@ grid.arrange(p10, nrow = 1)
 
 
 
+# GARCH(1,2) Model using the library rugarch ------------------------------
+# Fit the Model
+garch12bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(1, 2)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch12bitfit <- ugarchfit(spec = garch12bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(1,2)
+# -3.061493
+infocriteria(garch12bitfit)
+(-2*likelihood(garch12bitfit))/length(rt)+2*(length(garch12bitfit@fit$coef))/length(rt)
+garch12bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_12 <- zoo(x = garch12bitfit@fit$var, order.by = prices$Date)
+
+p11 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_12), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(1,2) modeled variance')
+grid.arrange(p11, nrow = 1)
+
+# GARCH(2,1) Model using the library rugarch ------------------------------
+# Fit the Model
+garch21bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(2, 1)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch21bitfit <- ugarchfit(spec = garch21bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(2,1)
+# -3.037832
+infocriteria(garch21bitfit)
+(-2*likelihood(garch21bitfit))/length(rt)+2*(length(garch21bitfit@fit$coef))/length(rt)
+garch21bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_21 <- zoo(x = garch21bitfit@fit$var, order.by = prices$Date)
+
+p12 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_21), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(2,1) modeled variance')
+grid.arrange(p12, nrow = 1)
+
+# GARCH(2,2) Model using the library rugarch ------------------------------
+# Fit the Model
+garch22bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(2, 2)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch22bitfit <- ugarchfit(spec = garch22bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(2,2)
+# -3.059271
+infocriteria(garch22bitfit)
+(-2*likelihood(garch22bitfit))/length(rt)+2*(length(garch22bitfit@fit$coef))/length(rt)
+garch22bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_22 <- zoo(x = garch22bitfit@fit$var, order.by = prices$Date)
+
+p13 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_22), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(2,2) modeled variance')
+grid.arrange(p13, nrow = 1)
+
+
+# GARCH(0,2) Model using the library rugarch ------------------------------
+# Fit the Model
+garch02bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(0, 2)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch02bitfit <- ugarchfit(spec = garch02bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(0,2)
+# -2.877087
+infocriteria(garch02bitfit)
+(-2*likelihood(garch02bitfit))/length(rt)+2*(length(garch02bitfit@fit$coef))/length(rt)
+garch02bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_02 <- zoo(x = garch02bitfit@fit$var, order.by = prices$Date)
+
+p14 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_02), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(0,2) modeled variance')
+grid.arrange(p14, nrow = 1)
+
+# GARCH(2,0) Model using the library rugarch ------------------------------
+# Fit the Model
+garch20bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(2, 0)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch20bitfit <- ugarchfit(spec = garch20bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(2,0)
+# -2.924872
+infocriteria(garch20bitfit)
+(-2*likelihood(garch20bitfit))/length(rt)+2*(length(garch20bitfit@fit$coef))/length(rt)
+garch20bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_20 <- zoo(x = garch20bitfit@fit$var, order.by = prices$Date)
+
+p15 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_20), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(2,0) modeled variance')
+grid.arrange(p15, nrow = 1)
