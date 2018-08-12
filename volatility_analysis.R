@@ -1,10 +1,11 @@
 setwd("F:/Bitcoin-Quantitative-Analysis-BQA-")
 
-# load relevant libraries
+## Load relevant libraries ------------------------------------------------
 library(ggplot2); library(gridExtra)
 library(tseries); library(zoo); library(forecast)
 library(rugarch)
 
+## Load and Prepare the Data ----------------------------------------------
 # print all CSV files int the working directory
 drfiles <- list.files()
 drfiles[grepl('csv', drfiles)]
@@ -45,140 +46,163 @@ prices$Squared_Returns <- prices$Log_Returns^2
 
 # Plot Bitcoin price series against time
 p1 <- ggplot() +
-  geom_line(aes(x = prices$Date, y = prices$Market_Price), col = 'blue') + 
+  geom_line(aes(x = prices$Date, y = prices$Market_Price), col = 'blue', size = 1) + 
   xlab('Date') +
   ylab('Market Price') +
   ggtitle('Bitcoin Price Series')
 
 # Plot Bitcoin log-returns against time
 p2 <- ggplot() +
-  geom_line(aes(x = prices$Date, y = prices$Log_Returns), col = 'red') + 
+  geom_line(aes(x = prices$Date, y = prices$Log_Returns), col = 'red', size = 1) + 
   xlab('Date') +
   ylab('Log Returns') +
   ggtitle('Bitcoin Return Series')
 
 # Plot Bitcoin Squared Returns against time
 p3 <- ggplot() +
-  geom_line(aes(x = prices$Date, y = prices$Squared_Returns), col = 'black') + 
+  geom_line(aes(x = prices$Date, y = prices$Squared_Returns), col = 'black', size = 1) + 
   xlab('Date') +
   ylab('Squared Returns') +
   ggtitle('Squared Return Series')
-
-
-# # Plot zoo object
-# plot(zoo(x = prices$Squared_Returns, order.by = prices$Date),
-#      xlab = 'Date',
-#      ylab = 'Squared Returns')
 
 grid.arrange(p1, p2, p3, nrow = 3)
 
 # It's clear that the data is best taken 2014 onwards
 prices <- prices[which(prices$Date == '2014-01-01'):nrow(prices),]
 
+## Analysis ---------------------------------------------------------------
 # Plot Bitcoin price series against time
 p4 <- ggplot() +
-  geom_line(aes(x = prices$Date, y = prices$Market_Price), col = 'blue') + 
+  geom_line(aes(x = prices$Date, y = prices$Market_Price), col = 'blue', size = 1) + 
   xlab('Date') +
   ylab('Market Price') +
   ggtitle('Bitcoin Price Series')
 
 # Plot Bitcoin log-returns against time
 p5 <- ggplot() +
-  geom_line(aes(x = prices$Date, y = prices$Log_Returns), col = 'red') + 
+  geom_line(aes(x = prices$Date, y = prices$Log_Returns), col = 'red', size = 1) + 
   xlab('Date') +
   ylab('Log Returns') +
   ggtitle('Bitcoin Return Series')
 
 # Plot Bitcoin Squared Returns against time
 p6 <- ggplot() +
-  geom_line(aes(x = prices$Date, y = prices$Squared_Returns), col = 'black') + 
+  geom_line(aes(x = prices$Date, y = prices$Squared_Returns), col = 'black', size = 1) + 
   xlab('Date') +
   ylab('Squared Returns') +
   ggtitle('Squared Return Series')
 
 grid.arrange(p4, p5, p6, nrow = 3)
 
-# Conver the return series into a zoo object (rt)
+# Convert the return series into a zoo object (rt)
 rt <- zoo(x = prices$Log_Returns, order.by = prices$Date)
+
+# Kernel Density plot of lognormal returns
+ggplot() +
+  geom_density(aes(x = rt), alpha = 0.1) + 
+  xlab('Log Normal Returns') + 
+  ggtitle('Kernel Density of Returns')
 
 # Check whether returns can be modeled as ARIMA class of models
 # Visual Inspection clearly shows time series models can't be fit here
 par(mfrow = c(2,1)); acf(rt); pacf(rt); par(mfrow = c(1,1))
 
-# Convert the squared return series into a zoo object (ht) 
+# Convert the squared return series into a zoo object (et2) 
 et2 <- zoo(x = prices$Squared_Returns, order.by = prices$Date)
 
+# Check whether returns can be modeled as ARIMA class of models
+# Visual Inspection clearly shows time series models can't be fit here
+par(mfrow = c(2,1)); acf(et2); pacf(et2); par(mfrow = c(1,1))
 
-# Generate conditional variance series
-set.seed(1010)
-vt <- rnorm(n = nrow(prices), mean = 0, sd = 1)
-vt2 <- zoo(x = vt^2,
-          order.by = prices$Date)
-ht <- et2/vt2
-p7 <- ggplot() + 
-  geom_line(aes(x = prices$Date, y = ht), col = 'blue') +
-  xlab('Date') + 
-  ylab('Conditional Variance') +
-  ggtitle('Conditional Variance of Return Series')
-p8 <- ggplot() + 
-  geom_line(aes(x = prices$Date, y = vt), col = 'red') +
-  xlab('Date') + 
-  ylab('Standard Normal Random Variable') +
-  ggtitle('Time Series of Normal Independently Distributed Random Variable')
-p9 <- ggplot() + 
-  geom_line(aes(x = prices$Date, y = et2), col = 'black') +
-  xlab('Date') + 
-  ylab('Squared Returns') +
-  ggtitle('Squared Return Series')
-grid.arrange(p7, p8, p9, nrow = 3)
-
-
-# Plot autocorrelations and partial autocorrelations
-# Clearly, the conditional variance series cannot be modeled as ARMA
-par(mfrow = c(2,1))
-acf(ht) # cuts off at lag 1
-pacf(ht) # cuts off at lag 2
-par(mfrow = c(1,1))
-
-# GARCH(1,1) Model using the library rugarch
+# GARCH(1,1) Model using the library rugarch ------------------------------
+# Fit the Model
 garch11bit <- ugarchspec(variance.model = list(model = "sGARCH", 
                                                garchOrder = c(1, 1)), 
                          mean.model = list(armaOrder = c(0, 0)))
 garch11bitfit <- ugarchfit(spec = garch11bit, data = rt, solver = "hybrid")
-garch11bitfit
-names(garch11bitfit@fit)
-names(garch11bitfit@model)
 
-garch11bitfit@fit$condH # [1] 6.961193
+# AIC for GARCH(1,1)
+# -3.039882
+infocriteria(garch11bitfit)
+(-2*likelihood(garch11bitfit))/length(rt)+2*(length(garch11bitfit@fit$coef))/length(rt)
+garch11bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
-cond_var <- zoo(x = garch11bitfit@fit$var, order.by = prices$Date)
+cond_var_11 <- zoo(x = garch11bitfit@fit$var, order.by = prices$Date)
+
+p7 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_11), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(1,1) modeled variance')
+grid.arrange(p7, nrow = 1)
+
+# GARCH(0,1) Model using the library rugarch ------------------------------
+garch01bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(0, 1)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch01bitfit <- ugarchfit(spec = garch01bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(0,1)
+# -2.878556
+infocriteria(garch01bitfit)
+garch01bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_01 <- zoo(x = garch01bitfit@fit$var, order.by = prices$Date)
+
+p8 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_01), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(0,1) modeled variance')
+grid.arrange(p8, nrow = 1)
+
+# GARCH(1,0) Model using the library rugarch ------------------------------
+garch10bit <- ugarchspec(variance.model = list(model = "sGARCH", 
+                                               garchOrder = c(1, 0)), 
+                         mean.model = list(armaOrder = c(0, 0)))
+garch10bitfit <- ugarchfit(spec = garch10bit, data = rt, solver = "hybrid")
+
+# AIC for GARCH(1,0)
+# -2.919062
+infocriteria(garch10bitfit)
+garch10bitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_10 <- zoo(x = garch10bitfit@fit$var, order.by = prices$Date)
+
+p9 <- ggplot() + 
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_10), col = 'red', size = 1) +
+  xlab('Date') + 
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs GARCH(1,0) modeled variance')
+grid.arrange(p9, nrow = 1)
+
+# EWMA Model using library rugarch -----------------------------------------
+
+ewmabit <- ugarchspec(variance.model=list(model="iGARCH", garchOrder=c(1,1)), 
+                      mean.model=list(armaOrder=c(0,0), include.mean=TRUE),  
+                      distribution.model="norm", fixed.pars=list(omega=0))
+ewmabitfit <- ugarchfit(spec = ewmabit, data = rt, solver = 'hybrid')
+# AIC for EWMA
+# -2.947618
+infocriteria(ewmabitfit)
+ewmabitfit@fit$robust.matcoef
+
+# Estimated conditional variances
+cond_var_igarch <- zoo(x = ewmabitfit@fit$var, order.by = prices$Date)
 
 p10 <- ggplot() + 
-  geom_line(aes(x = prices$Date, y = et2), col = 'blue') +
+  geom_line(aes(x = prices$Date, y = et2), col = 'blue', size = 1) +
+  geom_line(aes(x = prices$Date, y = cond_var_igarch), col = 'red', size = 1) +
   xlab('Date') + 
-  ylab('Squared Returns') +
-  ggtitle('Squared Return Series')
-p11 <- ggplot() + 
-  geom_line(aes(x = prices$Date, y = cond_var), col = 'red') +
-  xlab('Date') + 
-  ylab('Conditional Variances') +
-  ggtitle('Modeled Variance')
-grid.arrange(p10, p11, nrow = 2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  ylab('Modeled Variance') +
+  ggtitle('Squared Return Series vs iGARCH modeled variance')
+grid.arrange(p10, nrow = 1)
 
 
 
