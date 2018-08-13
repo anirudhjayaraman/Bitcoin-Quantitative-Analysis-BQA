@@ -336,3 +336,8 @@ p15 <- ggplot() +
   ylab('Modeled Variance') +
   ggtitle('Squared Return Series vs GARCH(2,0) modeled variance')
 grid.arrange(p15, nrow = 1)
+
+
+# Forecasts ----------------------------------------------------------------
+plot(ugarchforecast(fitORspec = garch12bitfit, n.ahead = 10))
+
