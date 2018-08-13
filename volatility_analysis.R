@@ -121,11 +121,9 @@ garch11bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch11bitfit <- ugarchfit(spec = garch11bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(1,1)
-# -3.039882
-infocriteria(garch11bitfit)
-(-2*likelihood(garch11bitfit))/length(rt)+2*(length(garch11bitfit@fit$coef))/length(rt)
-garch11bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(1,1)
+ic_arch11 <- infocriteria(garch11bitfit) # (-2*likelihood(garch11bitfit))/length(rt)+2*(length(garch11bitfit@fit$coef))/length(rt)
+estimates_garch11 <- garch11bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_11 <- zoo(x = garch11bitfit@fit$var, order.by = prices$Date)
@@ -144,10 +142,9 @@ garch01bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch01bitfit <- ugarchfit(spec = garch01bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(0,1)
-# -2.878556
-infocriteria(garch01bitfit)
-garch01bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(0,1)
+ic_arch01 <- infocriteria(garch01bitfit)
+estimates_garch01 <- garch01bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_01 <- zoo(x = garch01bitfit@fit$var, order.by = prices$Date)
@@ -166,10 +163,9 @@ garch10bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch10bitfit <- ugarchfit(spec = garch10bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(1,0)
-# -2.919062
-infocriteria(garch10bitfit)
-garch10bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(1,0)
+ic_arch10 <- infocriteria(garch10bitfit)
+estimates_garch10 <- garch10bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_10 <- zoo(x = garch10bitfit@fit$var, order.by = prices$Date)
@@ -188,10 +184,10 @@ ewmabit <- ugarchspec(variance.model=list(model="iGARCH", garchOrder=c(1,1)),
                       mean.model=list(armaOrder=c(0,0), include.mean=TRUE),  
                       distribution.model="norm", fixed.pars=list(omega=0))
 ewmabitfit <- ugarchfit(spec = ewmabit, data = rt, solver = 'hybrid')
-# AIC for EWMA
-# -2.947618
-infocriteria(ewmabitfit)
-ewmabitfit@fit$robust.matcoef
+
+# Info Criteria for EWMA
+ic_ewma <- infocriteria(ewmabitfit)
+estimates_ewma <- ewmabitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_igarch <- zoo(x = ewmabitfit@fit$var, order.by = prices$Date)
@@ -211,11 +207,9 @@ garch12bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch12bitfit <- ugarchfit(spec = garch12bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(1,2)
-# -3.061493
-infocriteria(garch12bitfit)
-(-2*likelihood(garch12bitfit))/length(rt)+2*(length(garch12bitfit@fit$coef))/length(rt)
-garch12bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(1,2)
+ic_arch12 <- infocriteria(garch12bitfit) # (-2*likelihood(garch12bitfit))/length(rt)+2*(length(garch12bitfit@fit$coef))/length(rt)
+estimates_garch12 <- garch12bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_12 <- zoo(x = garch12bitfit@fit$var, order.by = prices$Date)
@@ -235,11 +229,9 @@ garch21bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch21bitfit <- ugarchfit(spec = garch21bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(2,1)
-# -3.037832
-infocriteria(garch21bitfit)
-(-2*likelihood(garch21bitfit))/length(rt)+2*(length(garch21bitfit@fit$coef))/length(rt)
-garch21bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(2,1)
+ic_arch21 <- infocriteria(garch21bitfit) # (-2*likelihood(garch21bitfit))/length(rt)+2*(length(garch21bitfit@fit$coef))/length(rt)
+estimates_garch21 <- garch21bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_21 <- zoo(x = garch21bitfit@fit$var, order.by = prices$Date)
@@ -259,11 +251,9 @@ garch22bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch22bitfit <- ugarchfit(spec = garch22bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(2,2)
-# -3.059271
-infocriteria(garch22bitfit)
-(-2*likelihood(garch22bitfit))/length(rt)+2*(length(garch22bitfit@fit$coef))/length(rt)
-garch22bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(2,2)
+ic_arch22 <- infocriteria(garch22bitfit) # (-2*likelihood(garch22bitfit))/length(rt)+2*(length(garch22bitfit@fit$coef))/length(rt)
+estimates_garch22 <- garch22bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_22 <- zoo(x = garch22bitfit@fit$var, order.by = prices$Date)
@@ -283,11 +273,9 @@ garch02bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch02bitfit <- ugarchfit(spec = garch02bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(0,2)
-# -2.877087
-infocriteria(garch02bitfit)
-(-2*likelihood(garch02bitfit))/length(rt)+2*(length(garch02bitfit@fit$coef))/length(rt)
-garch02bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(0,2)
+ic_arch02 <- infocriteria(garch02bitfit) # (-2*likelihood(garch02bitfit))/length(rt)+2*(length(garch02bitfit@fit$coef))/length(rt)
+estimates_garch02 <- garch02bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_02 <- zoo(x = garch02bitfit@fit$var, order.by = prices$Date)
@@ -307,11 +295,9 @@ garch20bit <- ugarchspec(variance.model = list(model = "sGARCH",
                          mean.model = list(armaOrder = c(0, 0)))
 garch20bitfit <- ugarchfit(spec = garch20bit, data = rt, solver = "hybrid")
 
-# AIC for GARCH(2,0)
-# -2.924872
-infocriteria(garch20bitfit)
-(-2*likelihood(garch20bitfit))/length(rt)+2*(length(garch20bitfit@fit$coef))/length(rt)
-garch20bitfit@fit$robust.matcoef
+# Info Criteria for GARCH(2,0)
+ic_arch20 <- infocriteria(garch20bitfit) # (-2*likelihood(garch20bitfit))/length(rt)+2*(length(garch20bitfit@fit$coef))/length(rt)
+estimates_garch20 <- garch20bitfit@fit$robust.matcoef
 
 # Estimated conditional variances
 cond_var_20 <- zoo(x = garch20bitfit@fit$var, order.by = prices$Date)
@@ -326,5 +312,28 @@ grid.arrange(p15, nrow = 1)
 
 
 # Forecasts ----------------------------------------------------------------
+# Based on information criteria and significance of coefficient estimates, narrow down 
+# on GARCH(1,2) and GARCH (2,2) models which have similar information criteria. 
+# Since GARCH(1,2) is the more parsimonious of the two, GARCH(1,2) is shortlisted
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
