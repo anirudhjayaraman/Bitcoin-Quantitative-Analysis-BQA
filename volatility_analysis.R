@@ -204,18 +204,6 @@ p10 <- ggplot() +
   ggtitle('Squared Return Series vs iGARCH modeled variance')
 grid.arrange(p10, nrow = 1)
 
-#
-
-
-
-
-
-
-
-
-
-
-
 # GARCH(1,2) Model using the library rugarch ------------------------------
 # Fit the Model
 garch12bit <- ugarchspec(variance.model = list(model = "sGARCH", 
@@ -288,7 +276,6 @@ p13 <- ggplot() +
   ggtitle('Squared Return Series vs GARCH(2,2) modeled variance')
 grid.arrange(p13, nrow = 1)
 
-
 # GARCH(0,2) Model using the library rugarch ------------------------------
 # Fit the Model
 garch02bit <- ugarchspec(variance.model = list(model = "sGARCH", 
@@ -339,5 +326,5 @@ grid.arrange(p15, nrow = 1)
 
 
 # Forecasts ----------------------------------------------------------------
-plot(ugarchforecast(fitORspec = garch12bitfit, n.ahead = 10))
+
 
