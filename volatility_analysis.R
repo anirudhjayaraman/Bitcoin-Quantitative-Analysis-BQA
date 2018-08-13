@@ -311,29 +311,57 @@ p15 <- ggplot() +
 grid.arrange(p15, nrow = 1)
 
 
-# Forecasts ----------------------------------------------------------------
+# Model Identification ------------------------------------------------------
 # Based on information criteria and significance of coefficient estimates, narrow down 
 # on GARCH(1,2) and GARCH (2,2) models which have similar information criteria. 
-# Since GARCH(1,2) is the more parsimonious of the two, GARCH(1,2) is shortlisted
+# Since GARCH(1,2) is the more parsimonious of the two, with slightly better IC stats,
+# GARCH(1,2) is shortlisted
+
+ic_models <- data.frame(rbind(ic_arch01[,],
+                              ic_arch10[,],
+                              ic_arch11[,],
+                              ic_arch20[,],
+                              ic_arch02[,],
+                              ic_arch12[,],
+                              ic_arch21[,],
+                              ic_arch22[,],
+                              ic_ewma[,]))
+
+rownames(ic_models) <- c('arch01',
+                        'arch10',
+                        'arch11',
+                        'arch20',
+                        'arch02',
+                        'arch12',
+                        'arch21',
+                        'arch22',
+                        'ewma')
+
+# Model with minimum AIC
+rownames(ic_models)[which.min(ic_models$Akaike)]
+
+# Model with minimum BIC
+rownames(ic_models)[which.min(ic_models$Bayes)]
+
+# Model with minimum SIC
+rownames(ic_models)[which.min(ic_models$Shibata)]
+
+# Model with minimum HQC
+rownames(ic_models)[which.min(ic_models$Hannan.Quinn)]
 
 
+## Forecasting using GARCH(1,2) 
+bitcoin_return_preds <- ugarchboot(fitORspec = garch12bitfit, 
+                                   method = c("Partial", "Full")[2], 
+                                   n.ahead = 252, 
+                                   n.bootpred = 252)
+show(bitcoin_return_preds)
+plot(bitcoin_return_preds)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+bitcoin_return_preds@fseries
+bitcoin_return_preds@fsigma
+bitcoin_return_preds@bcoef
+bitcoin_return_preds@model
+bitcoin_return_preds@model$modeldata$meanfit.x
+bitcoin_return_preds@model$modeldata$meanfit.s
+bitcoin_return_preds@forc
