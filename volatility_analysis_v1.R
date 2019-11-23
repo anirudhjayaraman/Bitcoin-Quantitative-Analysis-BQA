@@ -1,4 +1,4 @@
-setwd("F:/Bitcoin-Quantitative-Analysis-BQA-")
+setwd("F:/Bitcoin-Quantitative-Analysis-BQA")
 
 ## Load relevant libraries ------------------------------------------------
 library(ggplot2); library(gridExtra)
@@ -90,7 +90,7 @@ garch12bitfitroll <- ugarchroll(spec = garch12bit, data = rt, n.start = 100,
                                 VaR.alpha = 0.01, keep.coef = TRUE,
                                 solver.control = list(tol = 1e-7, delta = 1e-9), 
                                 fit.control = list(scale = 1))
-# report(object = garch12bitfitroll, type = 'VaR', VaR.alpha = 0.01,conf.level = 0.99)
+report(object = garch12bitfitroll, type = 'VaR', VaR.alpha = 0.01,conf.level = 0.99)
 # plot(garch12bitfit)
 # Forecasting using GARCH(1,2) 
 bitcoin_return_preds <- ugarchboot(fitORspec = garch12bitfit, 
